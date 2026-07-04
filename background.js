@@ -15,6 +15,36 @@ chrome.runtime.onConnect.addListener((port) => {
   });
 });
 
+// --- Auto-save: crash recovery snapshot ---
+// Any group change schedules a debounced save (each event resets the 30s alarm).
+const AUTO_NAME = "Auto-saved (crash recovery)";
+
+for (const ev of [chrome.tabGroups.onCreated, chrome.tabGroups.onUpdated, chrome.tabGroups.onRemoved]) {
+  ev.addListener(scheduleAutoSave);
+}
+chrome.tabs.onUpdated.addListener((_id, info) => {
+  if (info.groupId !== undefined) scheduleAutoSave();
+});
+
+function scheduleAutoSave() {
+  chrome.alarms.create("autosave", { delayInMinutes: 0.5 });
+}
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name !== "autosave") return;
+  const groups = await chrome.tabGroups.query({});
+  // ponytail: no groups → keep last good auto-save (crash-recovery bias over freshness)
+  if (!groups.length) return;
+  const snapshot = [];
+  for (const g of groups) {
+    const tabs = await chrome.tabs.query({ groupId: g.id });
+    snapshot.push({ title: g.title, color: g.color, urls: tabs.map((t) => t.url) });
+  }
+  const { savedGroups = {} } = await chrome.storage.local.get("savedGroups");
+  savedGroups[AUTO_NAME] = { savedAt: Date.now(), auto: true, groups: snapshot };
+  await chrome.storage.local.set({ savedGroups });
+});
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   const handlers = { save, restore, removeSaved, listSaved };
   const handler = handlers[msg.action];
@@ -167,6 +197,7 @@ async function listSaved() {
   return Object.entries(savedGroups).map(([name, s]) => ({
     name,
     savedAt: s.savedAt,
+    auto: !!s.auto,
     groups: s.groups.length,
     tabs: s.groups.reduce((n, g) => n + g.urls.length, 0),
   }));

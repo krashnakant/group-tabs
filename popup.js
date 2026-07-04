@@ -63,7 +63,7 @@ async function refresh() {
 
     const meta = document.createElement("span");
     meta.className = "meta";
-    meta.textContent = `${s.groups}g · ${s.tabs}t`;
+    meta.textContent = `${s.auto ? "auto · " : ""}${s.groups}g · ${s.tabs}t`;
 
     const restore = document.createElement("button");
     restore.textContent = "Restore";

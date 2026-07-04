@@ -13,6 +13,7 @@ Chrome extension: auto-group tabs by domain (Chrome built-in AI classification w
 - **Refine with AI** — slower. Classifies tabs by topic via the built-in Prompt API (`LanguageModel`, Gemini Nano). Also regroups groups this extension created; manual groups and pinned tabs are never touched. Errors if the on-device model is unavailable.
 - **Save** — snapshots all tab groups in the current window (title, color, URLs) to `chrome.storage.local` under the given name.
 - **Restore** — reopens a snapshot's tabs and regroups them with original titles/colors.
+- **Auto-save** — every group change triggers a debounced (30 s) snapshot to "Auto-saved (crash recovery)". If Chrome crashes and drops your group assignments, restore from there.
 
 ## Test
 

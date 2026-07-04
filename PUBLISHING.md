@@ -38,6 +38,7 @@ Optional but improves listing: small promo tile 440×280.
   - `tabs` — read tab titles/URLs to group them by domain/topic and to save snapshots. (This permission triggers extra review scrutiny; justification must be specific.)
   - `tabGroups` — create/update tab groups.
   - `storage` — store snapshots locally.
+  - `alarms` (v0.2+) — debounce the automatic crash-recovery snapshot after tab-group changes.
 - **Data usage disclosure**: tab URLs/titles are processed **locally only** (domain rules or on-device Gemini Nano); nothing is transmitted anywhere. Declare "does not collect user data" — accurate because no remote calls exist.
 - **Privacy policy URL**: `https://krashnakant.github.io/group-tabs/privacy.html` — live via GitHub Pages (source: `privacy.html` in this repo, main branch). Paste into the dev console privacy tab.
 - **Remote code**: declare "No remote code" — true, everything is bundled.
