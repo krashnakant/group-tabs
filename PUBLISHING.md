@@ -39,9 +39,7 @@ Optional but improves listing: small promo tile 440×280.
   - `tabGroups` — create/update tab groups.
   - `storage` — store snapshots locally.
 - **Data usage disclosure**: tab URLs/titles are processed **locally only** (domain rules or on-device Gemini Nano); nothing is transmitted anywhere. Declare "does not collect user data" — accurate because no remote calls exist.
-- **Privacy policy URL**: required because the extension handles browsing data (`tabs` permission) even though it stays local. Ready-made page: `privacy.html` in this repo. Host it and paste the URL into the dev console. Quickest options:
-  - **GitHub Pages**: push repo to GitHub → Settings → Pages → serve from main → URL is `https://<user>.github.io/group-tabs/privacy.html`.
-  - **Gist**: paste `privacy.html` contents into a public gist as `privacy.md` (convert to markdown) — gist URL works too.
+- **Privacy policy URL**: `https://krashnakant.github.io/group-tabs/privacy.html` — live via GitHub Pages (source: `privacy.html` in this repo, main branch). Paste into the dev console privacy tab.
 - **Remote code**: declare "No remote code" — true, everything is bundled.
 
 ## Submit
