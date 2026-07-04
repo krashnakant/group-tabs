@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        font: 13px/1.4 system-ui;
+        width: 280px;
+        margin: 0;
+        padding: 12px;
+      }
+      h1 { font-size: 13px; margin: 0 0 10px; opacity: 0.7; }
+      button {
+        cursor: pointer;
+        font: inherit;
+        border: 1px solid rgba(128, 128, 128, 0.35);
+        border-radius: 6px;
+        background: transparent;
+        padding: 4px 10px;
+      }
+      button:hover:not(:disabled) { background: rgba(128, 128, 128, 0.12); }
+      button:disabled { opacity: 0.5; cursor: default; }
+      #group {
+        width: 100%;
+        background: #1a73e8;
+        color: #fff;
+        border: none;
+        padding: 8px;
+        font-weight: 600;
+      }
+      #group:hover:not(:disabled) { background: #1765cc; }
+      #ai { width: 100%; margin-top: 6px; padding: 6px; }
+      #saveRow { display: flex; gap: 6px; margin-top: 10px; }
+      #saveRow input {
+        flex: 1;
+        font: inherit;
+        padding: 4px 8px;
+        border: 1px solid rgba(128, 128, 128, 0.35);
+        border-radius: 6px;
+        background: transparent;
+      }
+      #status {
+        margin-top: 10px;
+        min-height: 1.4em;
+        opacity: 0.75;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .spin {
+        width: 12px;
+        height: 12px;
+        flex: none;
+        border: 2px solid #1a73e8;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      h2 { font-size: 12px; margin: 14px 0 4px; opacity: 0.7; }
+      ul { list-style: none; padding: 0; margin: 0; }
+      #saved li {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 0;
+        border-top: 1px solid rgba(128, 128, 128, 0.2);
+      }
+      #saved .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #saved .meta { opacity: 0.6; font-size: 11px; }
+      .empty { opacity: 0.5; font-style: italic; padding: 4px 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Group Tabs</h1>
+    <button id="group">Group by domain</button>
+    <button id="ai">Refine with AI (slower)</button>
+    <div id="saveRow">
+      <input id="saveName" placeholder="Snapshot name" />
+      <button id="save">Save</button>
+    </div>
+    <h2>Saved snapshots</h2>
+    <ul id="saved"></ul>
+    <div id="status"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>
