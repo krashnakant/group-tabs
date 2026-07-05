@@ -2,6 +2,17 @@
 
 Chrome extension: auto-group tabs by domain (Chrome built-in AI classification when Gemini Nano is available), save and restore group snapshots.
 
+**[Website](https://krashnakant.github.io/group-tabs/)** · ⏳ Chrome Web Store — awaiting review
+
+<p align="center">
+  <img src="store-assets/marquee-promo-ai.png" alt="Group Tabs — auto-group tabs by domain with on-device AI" width="700">
+</p>
+
+<p align="center">
+  <img src="store-assets/screenshot-3-before.png" alt="Before: ungrouped tab soup" width="420">
+  <img src="store-assets/screenshot-2.png" alt="After: tabs grouped by topic" width="420">
+</p>
+
 ## Load
 
 1. `chrome://extensions` → enable Developer mode
