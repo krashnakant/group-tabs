@@ -40,6 +40,8 @@
         border-radius: 6px;
         background: transparent;
       }
+      #autoRow { display: block; margin-top: 8px; font-size: 12px; opacity: 0.75; }
+      #autoRow select { font: inherit; }
       #status {
         margin-top: 10px;
         min-height: 1.4em;
@@ -80,6 +82,16 @@
       <input id="saveName" placeholder="Snapshot name" />
       <button id="save">Save</button>
     </div>
+    <label id="autoRow">
+      Auto-save every
+      <select id="autoSave">
+        <option value="0">Off</option>
+        <option value="0.5">30s</option>
+        <option value="1">1m</option>
+        <option value="5">5m</option>
+        <option value="15">15m</option>
+      </select>
+    </label>
     <h2>Saved snapshots</h2>
     <ul id="saved"></ul>
     <div id="status"></div>

@@ -26,27 +26,41 @@ chrome.tabs.onUpdated.addListener((_id, info) => {
   if (info.groupId !== undefined) scheduleAutoSave();
 });
 
-function scheduleAutoSave() {
-  chrome.alarms.create("autosave", { delayInMinutes: 0.5 });
+async function scheduleAutoSave() {
+  const { autoSaveMins = 0.5 } = await chrome.storage.local.get("autoSaveMins");
+  if (!autoSaveMins) return; // off
+  chrome.alarms.create("autosave", { delayInMinutes: autoSaveMins });
 }
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== "autosave") return;
+  // off-check at fire time too — a pending alarm survives the setting change
+  const { autoSaveMins = 0.5 } = await chrome.storage.local.get("autoSaveMins");
+  if (!autoSaveMins) return;
   const groups = await chrome.tabGroups.query({});
   // ponytail: no groups → keep last good auto-save (crash-recovery bias over freshness)
   if (!groups.length) return;
-  const snapshot = [];
-  for (const g of groups) {
-    const tabs = await chrome.tabs.query({ groupId: g.id });
-    snapshot.push({ title: g.title, color: g.color, urls: tabs.map((t) => t.url) });
-  }
-  const { savedGroups = {} } = await chrome.storage.local.get("savedGroups");
-  savedGroups[AUTO_NAME] = { savedAt: Date.now(), auto: true, groups: snapshot };
+  const savedGroups = await getSaved();
+  savedGroups[AUTO_NAME] = { savedAt: Date.now(), auto: true, groups: await snapshotGroups(groups) };
   await chrome.storage.local.set({ savedGroups });
 });
 
+// One tabs.query for all groups instead of one per group.
+async function snapshotGroups(groups) {
+  const tabs = await chrome.tabs.query({});
+  return groups.map((g) => ({
+    title: g.title,
+    color: g.color,
+    urls: tabs.filter((t) => t.groupId === g.id).map((t) => t.url),
+  }));
+}
+
+async function getSaved() {
+  return (await chrome.storage.local.get("savedGroups")).savedGroups ?? {};
+}
+
+const handlers = { save, restore, removeSaved, listSaved };
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  const handlers = { save, restore, removeSaved, listSaved };
   const handler = handlers[msg.action];
   if (!handler) return;
   handler(msg)
@@ -79,13 +93,26 @@ async function group({ mode }, onProgress) {
   let grouped = 0;
   let groups = 0;
   const newIds = [];
+  // existing groups by title — same-name tabs join them instead of duplicating
+  const existing = await chrome.tabGroups.query({ windowId: tabs[0].windowId });
+  const byTitle = new Map(existing.map((g) => [g.title, g.id]));
   // shuffle: random colors each run, no repeats until all 9 are used
   const colors = [...COLORS].sort(() => Math.random() - 0.5);
   for (const [name, tabIds] of Object.entries(assignment)) {
-    if (tabIds.length < 2) continue; // singletons stay loose
-    const groupId = await chrome.tabs.group({ tabIds });
-    await chrome.tabGroups.update(groupId, { title: name, color: colors[groups % colors.length] });
-    newIds.push(groupId);
+    const existingId = byTitle.get(name);
+    if (existingId === undefined && tabIds.length < 2) continue; // singletons stay loose
+    let groupId;
+    try {
+      groupId = await chrome.tabs.group(existingId !== undefined ? { tabIds, groupId: existingId } : { tabIds });
+    } catch {
+      // existing group emptied mid-loop and auto-removed — create fresh
+      if (tabIds.length < 2) continue;
+      groupId = await chrome.tabs.group({ tabIds });
+    }
+    if (groupId !== existingId) {
+      await chrome.tabGroups.update(groupId, { title: name, color: colors[newIds.length % colors.length] });
+      newIds.push(groupId);
+    }
     grouped += tabIds.length;
     groups++;
   }
@@ -163,20 +190,14 @@ async function save({ name }) {
   const groups = await chrome.tabGroups.query({ windowId: win.id });
   if (!groups.length) return { error: "No tab groups in this window" };
 
-  const snapshot = [];
-  for (const g of groups) {
-    const tabs = await chrome.tabs.query({ groupId: g.id });
-    snapshot.push({ title: g.title, color: g.color, urls: tabs.map((t) => t.url) });
-  }
-  const { savedGroups = {} } = await chrome.storage.local.get("savedGroups");
-  savedGroups[name] = { savedAt: Date.now(), groups: snapshot };
+  const savedGroups = await getSaved();
+  savedGroups[name] = { savedAt: Date.now(), groups: await snapshotGroups(groups) };
   await chrome.storage.local.set({ savedGroups });
-  return { saved: snapshot.length };
+  return { saved: groups.length };
 }
 
 async function restore({ name }) {
-  const { savedGroups = {} } = await chrome.storage.local.get("savedGroups");
-  const snap = savedGroups[name];
+  const snap = (await getSaved())[name];
   if (!snap) return { error: `No saved set named "${name}"` };
 
   for (const g of snap.groups) {
@@ -188,15 +209,14 @@ async function restore({ name }) {
 }
 
 async function removeSaved({ name }) {
-  const { savedGroups = {} } = await chrome.storage.local.get("savedGroups");
+  const savedGroups = await getSaved();
   delete savedGroups[name];
   await chrome.storage.local.set({ savedGroups });
   return { ok: true };
 }
 
 async function listSaved() {
-  const { savedGroups = {} } = await chrome.storage.local.get("savedGroups");
-  return Object.entries(savedGroups).map(([name, s]) => ({
+  return Object.entries(await getSaved()).map(([name, s]) => ({
     name,
     savedAt: s.savedAt,
     auto: !!s.auto,

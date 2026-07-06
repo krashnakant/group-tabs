@@ -97,4 +97,11 @@ async function refresh() {
   }
 }
 
+chrome.storage.local.get("autoSaveMins").then(({ autoSaveMins = 0.5 }) => {
+  $("autoSave").value = String(autoSaveMins);
+});
+$("autoSave").onchange = (e) => {
+  chrome.storage.local.set({ autoSaveMins: Number(e.target.value) });
+};
+
 refresh();
