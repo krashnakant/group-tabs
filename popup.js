@@ -8,6 +8,14 @@ function setStatus(text, busy = false) {
   el.appendChild(document.createTextNode(text));
 }
 
+function ago(ts) {
+  const m = Math.round((Date.now() - ts) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  if (m < 1440) return `${Math.round(m / 60)}h ago`;
+  return `${Math.round(m / 1440)}d ago`;
+}
+
 function runGroup(mode) {
   $("group").disabled = $("ai").disabled = true;
   setStatus("Grouping…", true);
@@ -63,7 +71,8 @@ async function refresh() {
 
     const meta = document.createElement("span");
     meta.className = "meta";
-    meta.textContent = `${s.auto ? "auto · " : ""}${s.groups}g · ${s.tabs}t`;
+    meta.textContent = `${s.auto ? "auto · " : ""}${s.groups}g · ${s.tabs}t · ${ago(s.savedAt)}`;
+    meta.title = s.titles.join("\n");
 
     const restore = document.createElement("button");
     restore.textContent = "Restore";

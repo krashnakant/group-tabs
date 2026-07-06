@@ -79,10 +79,12 @@ async function group({ mode }, onProgress) {
   let grouped = 0;
   let groups = 0;
   const newIds = [];
+  // shuffle: random colors each run, no repeats until all 9 are used
+  const colors = [...COLORS].sort(() => Math.random() - 0.5);
   for (const [name, tabIds] of Object.entries(assignment)) {
     if (tabIds.length < 2) continue; // singletons stay loose
     const groupId = await chrome.tabs.group({ tabIds });
-    await chrome.tabGroups.update(groupId, { title: name, color: COLORS[groups % COLORS.length] });
+    await chrome.tabGroups.update(groupId, { title: name, color: colors[groups % colors.length] });
     newIds.push(groupId);
     grouped += tabIds.length;
     groups++;
@@ -200,5 +202,6 @@ async function listSaved() {
     auto: !!s.auto,
     groups: s.groups.length,
     tabs: s.groups.reduce((n, g) => n + g.urls.length, 0),
+    titles: s.groups.map((g) => `${g.title || "(untitled)"} (${g.urls.length})`),
   }));
 }
