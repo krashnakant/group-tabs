@@ -52,39 +52,6 @@ Optional but improves listing: small promo tile 440×280.
 3. Set visibility: **Unlisted** first (installable via link, no public search) — sane for a v0.1 shakedown; flip to Public later without re-review of visibility itself.
 4. Submit for review. Typical review: 1–3 days; `tabs` permission can push it longer.
 
-## Automated updates after the first publish
-
-The initial listing, privacy questionnaire, and first visibility selection must still be completed manually. After that, `.github/workflows/publish-chrome.yml` tests, packages, uploads, and submits each tagged version for review through Chrome Web Store API v2.
-
-### One-time API setup
-
-1. In Google Cloud, enable **Chrome Web Store API**.
-2. Create an **External** OAuth consent screen and add the publisher Google account as a test user.
-3. Move the OAuth app to **In production** before generating the refresh token. Tokens issued while the app is in Testing expire after seven days.
-4. Create a **Web application** OAuth client with `https://developers.google.com/oauthplayground` as an authorized redirect URI.
-5. In OAuth Playground, enable **Use your own OAuth credentials**, authorize `https://www.googleapis.com/auth/chromewebstore` with the publisher account, then exchange the authorization code for a refresh token.
-6. In GitHub → repository **Settings → Environments**, create `chrome-web-store`. Restrict deployment tags to `v*`, add the publisher as a required reviewer, and add these environment secrets:
-   - `CWS_CLIENT_ID`
-   - `CWS_CLIENT_SECRET`
-   - `CWS_REFRESH_TOKEN`
-
-The workflow uses publisher `3359ea7f-1e86-4a04-afad-2179a56c07e8` and extension `phgemhmkidohfhckegoemicfjeofnlbp`. These IDs are public and live in the workflow; OAuth credentials must remain protected environment secrets.
-
-### Release a version
-
-1. Bump `version` in `manifest.json` and update `CHANGELOG.md`.
-2. Commit and push the release changes.
-3. Push a matching tag:
-
-```sh
-git tag v0.2.1
-git push origin v0.2.1
-```
-
-The tag must equal `v` plus the manifest version and point to a commit on `main`. The workflow runs `node test.mjs`, builds only runtime files, waits for upload processing, and calls `publish` with `DEFAULT_PUBLISH`, which submits the version for review and publishes it automatically after approval. Push one release tag at a time: the concurrency group lets the current run finish but retains only the newest pending release.
-
-Official setup reference: https://developer.chrome.com/docs/webstore/using-api
-
 ## Microsoft Edge Add-ons (same zip)
 
 Edge runs the extension unchanged, including AI mode (Edge 138+ ships the same Prompt API backed by Phi-4-mini; Brave/Opera/Vivaldi lack it and the UI hides AI options automatically).
