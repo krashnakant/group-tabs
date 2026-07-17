@@ -1,100 +1,227 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
+    <title>Group Tabs</title>
     <style>
-      :root { color-scheme: light dark; }
+      :root {
+        color-scheme: light dark;
+        --accent: #1769e0;
+        --accent-strong: #0f55bd;
+        --bg: #f7f8fb;
+        --panel: #ffffff;
+        --text: #16191f;
+        --muted: #626875;
+        --line: #e1e4ea;
+        --danger: #b3261e;
+      }
+      * { box-sizing: border-box; }
       body {
-        font: 13px/1.4 system-ui;
-        width: 280px;
+        width: 340px;
         margin: 0;
-        padding: 12px;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.45 system-ui, -apple-system, sans-serif;
       }
-      h1 { font-size: 13px; margin: 0 0 10px; opacity: 0.7; }
+      button, input { font: inherit; }
       button {
+        min-height: 40px;
         cursor: pointer;
-        font: inherit;
-        border: 1px solid rgba(128, 128, 128, 0.35);
-        border-radius: 6px;
-        background: transparent;
-        padding: 4px 10px;
+        color: inherit;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
       }
-      button:hover:not(:disabled) { background: rgba(128, 128, 128, 0.12); }
-      button:disabled { opacity: 0.5; cursor: default; }
-      #group {
-        width: 100%;
-        background: #1a73e8;
-        color: #fff;
-        border: none;
-        padding: 8px;
-        font-weight: 600;
+      button:hover:not(:disabled) { border-color: #b9bec8; background: #f0f2f6; }
+      button:focus-visible, input:focus-visible, summary:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--accent) 28%, transparent);
+        outline-offset: 2px;
       }
-      #group:hover:not(:disabled) { background: #1765cc; }
-      #ai { width: 100%; margin-top: 6px; padding: 6px; }
-      #saveRow { display: flex; gap: 6px; margin-top: 10px; }
-      #saveRow input {
-        flex: 1;
-        font: inherit;
-        padding: 4px 8px;
-        border: 1px solid rgba(128, 128, 128, 0.35);
-        border-radius: 6px;
-        background: transparent;
-      }
-      #autoRow { display: block; margin-top: 8px; font-size: 12px; opacity: 0.75; }
-      #autoRow select { font: inherit; }
-      #status {
-        margin-top: 10px;
-        min-height: 1.4em;
-        opacity: 0.75;
+      button:disabled { cursor: default; opacity: 0.5; }
+      header {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 10px;
+        padding: 16px 16px 13px;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+      }
+      .mark {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--accent);
+        color: white;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+      h1 { margin: 0; font-size: 16px; line-height: 1.2; letter-spacing: -0.01em; }
+      #summary { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+      main { padding: 14px 16px 16px; }
+      #group {
+        width: 100%;
+        min-height: 44px;
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+      #group:hover:not(:disabled) { border-color: var(--accent-strong); background: var(--accent-strong); }
+      #ai { width: 100%; margin-top: 8px; }
+      .ai-note { margin: 7px 2px 0; color: var(--muted); font-size: 12px; }
+      #status {
+        display: flex;
+        min-height: 22px;
+        align-items: center;
+        gap: 7px;
+        margin: 9px 2px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      #status:empty { margin-top: 2px; min-height: 0; }
+      #status button {
+        min-height: 30px;
+        margin-left: auto;
+        padding: 3px 10px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
       }
       .spin {
-        width: 12px;
-        height: 12px;
+        width: 13px;
+        height: 13px;
         flex: none;
-        border: 2px solid #1a73e8;
+        border: 2px solid var(--accent);
         border-top-color: transparent;
         border-radius: 50%;
         animation: spin 0.7s linear infinite;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
-      h2 { font-size: 12px; margin: 14px 0 4px; opacity: 0.7; }
-      ul { list-style: none; padding: 0; margin: 0; }
-      #saved li {
+      section { margin-top: 18px; }
+      .section-head {
         display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 0;
-        border-top: 1px solid rgba(128, 128, 128, 0.2);
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 8px;
       }
-      #saved .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      #saved .meta { opacity: 0.6; font-size: 11px; }
-      .empty { opacity: 0.5; font-style: italic; padding: 4px 0; }
+      h2 { margin: 0; font-size: 13px; letter-spacing: 0.01em; }
+      .section-note { color: var(--muted); font-size: 11px; }
+      label { display: block; color: var(--muted); font-size: 12px; font-weight: 650; }
+      #saveRow { display: flex; gap: 8px; margin-top: 6px; }
+      #saveName {
+        width: 100%;
+        min-height: 42px;
+        padding: 8px 11px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        color: var(--text);
+      }
+      #save { flex: none; min-width: 68px; color: var(--accent); font-weight: 700; }
+      ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+      .session {
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+      }
+      .session-top { display: flex; min-width: 0; align-items: center; gap: 8px; }
+      .name { min-width: 0; flex: 1; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+      .meta, .titles { color: var(--muted); font-size: 11px; }
+      .titles { margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .restore { width: 100%; margin-top: 9px; color: var(--accent); font-size: 12px; font-weight: 700; }
+      .delete {
+        width: 40px;
+        min-width: 40px;
+        padding: 0;
+        border-color: transparent;
+        color: var(--muted);
+        font-size: 18px;
+      }
+      .delete:hover:not(:disabled) { color: var(--danger); }
+      .empty { padding: 10px 0; color: var(--muted); font-size: 12px; }
+      #recoverySection[hidden] { display: none; }
+      details { margin-top: 16px; border-top: 1px solid var(--line); }
+      summary {
+        display: flex;
+        min-height: 44px;
+        align-items: center;
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        list-style: none;
+      }
+      summary::-webkit-details-marker { display: none; }
+      summary::after { margin-left: auto; content: "+"; font-size: 17px; font-weight: 400; }
+      details[open] summary::after { content: "−"; }
+      .tool-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 10px; }
+      .tool-row button { font-size: 12px; }
+      #settings { width: 100%; margin-top: 2px; color: var(--accent); font-size: 12px; font-weight: 700; }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --accent: #8ab4f8;
+          --accent-strong: #a8c7fa;
+          --bg: #15171c;
+          --panel: #1d2026;
+          --text: #edf0f6;
+          --muted: #aab0bc;
+          --line: #343842;
+          --danger: #f2b8b5;
+        }
+        #group { color: #10233f; }
+        button:hover:not(:disabled) { background: #292d35; border-color: #555b67; }
+      }
+      @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
     </style>
   </head>
   <body>
-    <h1>Group Tabs</h1>
-    <button id="group">Group by domain</button>
-    <button id="ai">Refine with AI (slower)</button>
-    <div id="saveRow">
-      <input id="saveName" placeholder="Snapshot name" />
-      <button id="save">Save</button>
-    </div>
-    <label id="autoRow">
-      Auto-save every
-      <select id="autoSave">
-        <option value="0">Off</option>
-        <option value="0.5">30s</option>
-        <option value="1">1m</option>
-        <option value="5">5m</option>
-        <option value="15">15m</option>
-      </select>
-    </label>
-    <h2>Saved snapshots</h2>
-    <ul id="saved"></ul>
-    <div id="status"></div>
-    <script src="popup.js"></script>
+    <header>
+      <div class="mark" aria-hidden="true">GT</div>
+      <div>
+        <h1>Group Tabs</h1>
+        <p id="summary">Checking this window…</p>
+      </div>
+    </header>
+    <main>
+      <button id="group">Organize loose tabs by site</button>
+      <button id="ai">Organize by topic with AI</button>
+      <p id="aiUnavailable" class="ai-note" hidden>Topic grouping needs Chrome's on-device AI.</p>
+      <div id="status" role="status" aria-live="polite"></div>
+
+      <section>
+        <div class="section-head">
+          <h2>Save this window</h2>
+          <span class="section-note">Groups only</span>
+        </div>
+        <label for="saveName">Session name</label>
+        <div id="saveRow">
+          <input id="saveName" autocomplete="off" placeholder="e.g. Trip planning" />
+          <button id="save">Save</button>
+        </div>
+      </section>
+
+      <section id="recoverySection" hidden>
+        <div class="section-head"><h2>Recovery</h2><span class="section-note">This device</span></div>
+        <ul id="recovery"></ul>
+      </section>
+
+      <section>
+        <div class="section-head"><h2>Saved sessions</h2><span class="section-note">Manual</span></div>
+        <ul id="saved"></ul>
+      </section>
+
+      <details>
+        <summary>More actions</summary>
+        <div class="tool-row">
+          <button id="ungroupAll">Ungroup all</button>
+          <button id="toggleCollapse">Collapse groups</button>
+        </div>
+      </details>
+      <button id="settings">Settings and automation</button>
+    </main>
+    <script src="popup.js" type="module"></script>
   </body>
 </html>

@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Group Tabs",
   "version": "0.2.0",
-  "description": "Auto-group tabs by domain (AI-enhanced when Chrome built-in model is available). Save and restore groups.",
-  "permissions": ["tabs", "tabGroups", "storage", "alarms"],
+  "description": "Auto-group tabs by domain (AI-enhanced when your browser's built-in model is available). Save and restore groups.",
+  "permissions": ["tabs", "tabGroups", "storage", "alarms", "idle"],
   "background": {
     "service_worker": "background.js",
     "type": "module"
@@ -16,5 +16,15 @@
   },
   "action": {
     "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "group-tabs": {
+      "suggested_key": { "default": "Ctrl+Shift+G", "mac": "Command+Shift+G" },
+      "description": "Group tabs by domain"
+    }
   }
 }

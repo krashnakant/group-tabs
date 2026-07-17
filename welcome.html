@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to Group Tabs</title>
+    <style>
+      :root { color-scheme: dark; --accent: #76a7ff; --panel: #1b1f27; --muted: #aab2c2; --line: #343a47; }
+      * { box-sizing: border-box; }
+      body { min-height: 100vh; margin: 0; background: radial-gradient(circle at 70% 0, #202a3d 0, #11141a 46%); color: #f4f7fb; font: 15px/1.5 system-ui, sans-serif; }
+      main { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0; }
+      .eyebrow { margin: 0 0 14px; color: var(--accent); font: 700 12px/1.2 ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; }
+      h1 { max-width: 650px; margin: 0; font-size: clamp(38px, 7vw, 68px); line-height: .98; letter-spacing: -.055em; }
+      .lede { max-width: 560px; margin: 22px 0 34px; color: var(--muted); font-size: 18px; }
+      .rail { position: relative; display: flex; max-width: 760px; gap: 7px; align-items: end; margin: 0 0 44px; padding: 28px 28px 20px; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #171b22; box-shadow: 0 24px 80px #0008; }
+      .rail::after { position: absolute; right: 28px; bottom: 8px; left: 28px; height: 5px; border-radius: 9px; background: #090b0f; content: ""; }
+      .tab { position: relative; width: 76px; height: 38px; border-radius: 10px 10px 5px 5px; background: #2a303a; box-shadow: inset 0 -3px var(--color); }
+      .tab::before { position: absolute; top: 12px; left: 14px; width: 10px; height: 10px; border-radius: 3px; background: var(--color); content: ""; }
+      .tab::after { position: absolute; top: -17px; left: 0; padding: 2px 9px; border-radius: 7px 7px 4px 4px; background: var(--color); color: #111; content: attr(data-group); font-size: 10px; font-weight: 800; }
+      .tab:nth-child(2)::after, .tab:nth-child(3)::after, .tab:nth-child(5)::after { display: none; }
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .step { min-height: 180px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--panel) 90%, transparent); }
+      .number { display: grid; width: 28px; height: 28px; place-items: center; margin-bottom: 22px; border-radius: 8px; background: #2a3343; color: var(--accent); font: 700 12px ui-monospace, monospace; }
+      h2 { margin: 0 0 7px; font-size: 17px; }
+      .step p { margin: 0; color: var(--muted); font-size: 13px; }
+      .actions { display: flex; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+      button { min-height: 46px; cursor: pointer; border: 1px solid var(--line); border-radius: 11px; padding: 10px 18px; background: transparent; color: #f4f7fb; font: 700 14px system-ui; }
+      #organize { border-color: #8bb6ff; background: var(--accent); color: #10213d; }
+      button:hover:not(:disabled) { transform: translateY(-1px); }
+      button:disabled { cursor: default; opacity: .6; }
+      button:focus-visible { outline: 3px solid #76a7ff66; outline-offset: 3px; }
+      #status { min-height: 22px; color: var(--muted); font-size: 13px; }
+      .fine { max-width: 650px; margin: 34px 0 0; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+      kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 2px 6px; background: #222833; }
+      @media (max-width: 680px) { main { padding: 38px 0; } .steps { grid-template-columns: 1fr; } .step { min-height: auto; } .rail { gap: 5px; padding-inline: 16px; } .tab { width: 43px; min-width: 43px; } }
+      @media (prefers-reduced-motion: reduce) { button:hover:not(:disabled) { transform: none; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Installed · First run</p>
+      <h1>Turn open tabs into a working set.</h1>
+      <p class="lede">Group matching sites now, then keep the result as a session you can reopen later.</p>
+      <div class="rail" aria-label="Tabs organized into GitHub, docs, and research groups">
+        <span class="tab" style="--color:#58a6ff" data-group="github"></span><span class="tab" style="--color:#58a6ff"></span><span class="tab" style="--color:#58a6ff"></span><span class="tab" style="--color:#f1c232" data-group="docs"></span><span class="tab" style="--color:#f1c232"></span><span class="tab" style="--color:#45c46b" data-group="research"></span>
+      </div>
+      <div class="steps">
+        <article class="step"><span class="number">01</span><h2>Pin the extension</h2><p>Open Chrome's puzzle menu and pin Group Tabs so the control stays in your toolbar.</p></article>
+        <article class="step"><span class="number">02</span><h2>Organize this window</h2><p>Matching sites become groups. Pinned tabs, existing groups, and single-site tabs stay untouched.</p></article>
+        <article class="step"><span class="number">03</span><h2>Save the result</h2><p>Open Group Tabs, name the window, and save it for later. Missing tabs restore into a new window.</p></article>
+      </div>
+      <div class="actions">
+        <button id="organize">Organize loose tabs now</button>
+        <button id="settings">Set up automation</button>
+        <output id="status" role="status" aria-live="polite"></output>
+      </div>
+      <p class="fine">Keyboard: <kbd>Ctrl+Shift+G</kbd> or <kbd>⌘Shift+G</kbd>. Topic grouping is optional and runs through the browser's built-in on-device AI when available. Group Tabs has no cloud service.</p>
+    </main>
+    <script src="welcome.js" type="module"></script>
+  </body>
+</html>

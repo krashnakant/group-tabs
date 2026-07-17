@@ -5,44 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Group Tabs — Privacy Policy</title>
   <style>
-    :root { color-scheme: light dark; }
-    body {
-      font: 16px/1.6 system-ui, sans-serif;
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    h1 { font-size: 26px; }
-    h2 { font-size: 18px; margin-top: 28px; }
-    .updated { opacity: 0.6; font-size: 14px; }
+    :root { color-scheme: light dark; --accent: #1769e0; --muted: #626875; --line: rgba(128,128,128,.25); }
+    body { max-width: 700px; margin: 0 auto; padding: 48px 22px 72px; font: 16px/1.65 system-ui, sans-serif; }
+    h1 { margin-bottom: 4px; font-size: 30px; letter-spacing: -.02em; }
+    h2 { margin-top: 34px; font-size: 18px; }
+    .updated { margin-top: 0; color: var(--muted); font-size: 14px; }
+    .summary { margin: 28px 0; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; }
+    code { padding: 2px 5px; border-radius: 5px; background: rgba(128,128,128,.14); }
+    a { color: var(--accent); }
   </style>
 </head>
 <body>
-  <h1>Group Tabs — Privacy Policy</h1>
-  <p class="updated">Last updated: July 5, 2026</p>
+  <h1>Group Tabs privacy policy</h1>
+  <p class="updated">Last updated: July 17, 2026</p>
 
-  <p>Group Tabs is a Chrome extension that organizes your open tabs into groups and lets you save and restore those groups. This policy describes what data it touches and where that data goes: <strong>nowhere</strong>.</p>
+  <p class="summary"><strong>No Group Tabs server, analytics, or account.</strong> Tab organization runs on your device. Small manual sessions may sync through Chrome Sync; automatic recovery snapshots stay on this device.</p>
 
   <h2>What the extension accesses</h2>
   <ul>
-    <li><strong>Tab titles and URLs</strong> of your open tabs — needed to group tabs by domain or topic and to save group snapshots.</li>
-    <li><strong>Tab group metadata</strong> (group names and colors) — needed to save and restore groups.</li>
+    <li><strong>Tab titles and URLs</strong> — to group tabs by site or topic and to save sessions.</li>
+    <li><strong>Tab group metadata</strong> such as names and colors — to save and restore groups.</li>
   </ul>
 
-  <h2>Where data is processed</h2>
-  <p>Entirely on your device. Grouping uses either simple domain rules or Chrome's built-in on-device AI model (Gemini Nano). No tab data is ever sent to any server, API, or third party. The extension makes no network requests.</p>
+  <h2>Where tab organization happens</h2>
+  <p>Site grouping uses local rules. Topic grouping uses the browser's built-in on-device Prompt API when available. The extension does not send tab titles or URLs to a Group Tabs server, third-party API, or analytics service, and it contains no remote code.</p>
 
   <h2>What is stored</h2>
-  <p>Saved snapshots (group names, colors, and tab URLs) are stored in Chrome's local extension storage (<code>chrome.storage.local</code>) on your device only. They are not synced, transmitted, or shared.</p>
+  <ul>
+    <li><strong>Manual saved sessions:</strong> group names, colors, and tab URLs are stored with <code>chrome.storage.sync</code> when the saved data fits Chrome's sync quota. Larger sessions stay in <code>chrome.storage.local</code> on this device.</li>
+    <li><strong>Automatic recovery snapshots:</strong> the latest three snapshots stay in <code>chrome.storage.local</code> on this device and are not synced.</li>
+    <li><strong>Settings:</strong> automation settings stay on this device. Preferred AI topic names may use Chrome Sync.</li>
+  </ul>
+  <p>Chrome Sync is a browser service governed by your Chrome account and Google settings. Group Tabs does not operate that service.</p>
 
-  <h2>What is collected</h2>
-  <p>Nothing. No analytics, no telemetry, no cookies, no accounts, no personal data collection of any kind.</p>
+  <h2>What the developer collects</h2>
+  <p>Nothing. Group Tabs has no analytics, telemetry, cookies, accounts, advertising, or developer-operated backend.</p>
 
   <h2>Data deletion</h2>
-  <p>Delete individual snapshots from the extension popup at any time. Uninstalling the extension removes all stored data permanently.</p>
+  <p>Delete any saved session from the popup; this removes it from whichever extension storage area contains it. Uninstalling removes device-local extension data. Chrome Sync data is also subject to your browser's sync and account controls.</p>
 
   <h2>Changes</h2>
-  <p>If this policy changes, the updated version will be posted at this URL with a new "last updated" date.</p>
+  <p>If this policy changes, the updated version will be posted at this URL with a new last-updated date.</p>
 
   <h2>Contact</h2>
   <p>Questions: <a href="mailto:pension.quart_7b@icloud.com">pension.quart_7b@icloud.com</a></p>

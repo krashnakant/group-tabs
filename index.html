@@ -1,159 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Group Tabs — tame your Chrome tabs</title>
-<meta name="description" content="A Chrome extension that auto-groups tabs by domain, refines groups by topic with on-device AI (Gemini Nano), and snapshots your groups so a crash never loses them.">
-<meta property="og:title" content="Group Tabs">
-<meta property="og:description" content="Auto-group Chrome tabs by domain, refine by topic with on-device AI, save & restore group snapshots.">
-<meta property="og:image" content="https://krashnakant.github.io/group-tabs/store-assets/marquee-promo-ai.png">
-<meta property="og:type" content="website">
-<link rel="icon" href="icons/icon32.png">
-<style>
-  :root {
-    --bg: #fbfbfd; --panel: #ffffff; --text: #1d1d1f; --sub: #6e6e73;
-    --line: rgba(0,0,0,.08); --accent: #0969da; --accent-2: #1a7f37;
-    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 12px 40px rgba(0,0,0,.07);
-  }
-  @media (prefers-color-scheme: dark) {
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Group Tabs — organize Chrome tabs without the cloud</title>
+  <meta name="description" content="Group matching Chrome tabs by site, refine them by topic with optional on-device AI, and restore saved sessions without a Group Tabs cloud service." />
+  <meta property="og:title" content="Group Tabs" />
+  <meta property="og:description" content="Turn loose Chrome tabs into useful groups. Save sessions, recover missing tabs, and keep organization on-device." />
+  <meta property="og:image" content="https://krashnakant.github.io/group-tabs/store-assets/marquee-promo-v3.png?v=1" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="icons/icon32.png" />
+  <style>
     :root {
-      --bg: #0b0b0d; --panel: #161618; --text: #f5f5f7; --sub: #98989d;
-      --line: rgba(255,255,255,.10); --accent: #4493f8; --accent-2: #3fb950;
-      --shadow: 0 1px 3px rgba(0,0,0,.4), 0 16px 50px rgba(0,0,0,.5);
+      color-scheme: dark;
+      --bg: #101216;
+      --panel: #181b21;
+      --panel-2: #1e222a;
+      --text: #f3f5f8;
+      --muted: #a4abb7;
+      --line: #30353f;
+      --blue: #70a7ff;
+      --yellow: #f0c84b;
+      --green: #54c77b;
+      --pink: #eb7ea7;
     }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
-
-  header { text-align: center; padding: 88px 0 64px; }
-  .icon { width: 120px; height: 120px; border-radius: 26px; box-shadow: var(--shadow); margin-bottom: 28px; }
-  h1 { font-size: 56px; letter-spacing: -.03em; margin: 0 0 10px; font-weight: 700; }
-  .tagline { font-size: 22px; color: var(--sub); max-width: 620px; margin: 0 auto 12px; letter-spacing: -.01em; }
-  .lede { font-size: 17px; color: var(--sub); max-width: 620px; margin: 0 auto 36px; }
-  .lede b { color: var(--text); font-weight: 600; }
-  .cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 12px;
-    font-weight: 600; font-size: 16px; transition: transform .12s ease;
-  }
-  .btn:hover { text-decoration: none; transform: translateY(-1px); }
-  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 20px rgba(9,105,218,.28); }
-  .btn-ghost { background: var(--panel); color: var(--text); border: 1px solid var(--line); box-shadow: var(--shadow); }
-  .meta { margin-top: 18px; font-size: 13px; color: var(--sub); }
-  .pill {
-    display: inline-block; background: #b35900; color: #fff; border-radius: 999px;
-    padding: 3px 12px; font-size: 13px; font-weight: 600; margin-top: 16px;
-  }
-
-  section { padding: 56px 0; border-top: 1px solid var(--line); }
-  h2 { font-size: 30px; letter-spacing: -.02em; margin: 0 0 8px; text-align: center; }
-  .sub { text-align: center; color: var(--sub); margin: 0 auto 40px; max-width: 560px; }
-
-  .shot { width: 100%; border-radius: 14px; border: 1px solid var(--line); box-shadow: var(--shadow); display: block; }
-  .shot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
-  @media (max-width: 640px) { .shot-grid { grid-template-columns: 1fr; } }
-
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); }
-  .card h3 { margin: 0 0 6px; font-size: 17px; letter-spacing: -.01em; }
-  .card p { margin: 0; color: var(--sub); font-size: 14.5px; }
-  .card .ic { font-size: 22px; margin-bottom: 12px; display: block; }
-
-  ol.steps { max-width: 680px; margin: 0 auto; padding-left: 0; counter-reset: s; list-style: none; }
-  ol.steps li { counter-increment: s; position: relative; padding: 16px 0 16px 52px; border-bottom: 1px solid var(--line); }
-  ol.steps li:last-child { border-bottom: 0; }
-  ol.steps li::before {
-    content: counter(s); position: absolute; left: 0; top: 14px; width: 32px; height: 32px;
-    background: var(--accent); color: #fff; border-radius: 50%; display: grid; place-items: center;
-    font-weight: 700; font-size: 15px;
-  }
-  ol.steps li b { font-weight: 600; }
-  code {
-    background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px;
-    font-size: 13.5px; font-family: "SF Mono", ui-monospace, Menlo, monospace;
-  }
-  .note { text-align: center; color: var(--sub); font-size: 13.5px; margin-top: 28px; }
-
-  footer { padding: 48px 0 64px; text-align: center; color: var(--sub); font-size: 14px; border-top: 1px solid var(--line); }
-  footer a { color: var(--sub); }
-  .links { display: flex; gap: 20px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
-
-  @media (max-width: 560px) { h1 { font-size: 40px; } .tagline { font-size: 19px; } header { padding: 56px 0 44px; } }
-</style>
+    * { box-sizing: border-box; }
+    html { overflow-x: hidden; scroll-behavior: smooth; }
+    body { margin: 0; overflow-x: hidden; background: var(--bg); color: var(--text); font: 16px/1.55 system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    nav { position: relative; z-index: 2; border-bottom: 1px solid var(--line); background: #101216e8; backdrop-filter: blur(18px); }
+    .nav-inner { display: flex; min-height: 68px; align-items: center; gap: 30px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; letter-spacing: -.02em; }
+    .brand img { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-links { display: flex; gap: 24px; margin-left: auto; color: var(--muted); font-size: 13px; }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { display: inline-flex; min-height: 40px; align-items: center; border-radius: 9px; padding: 8px 14px; background: var(--text); color: #111318; font-size: 13px; font-weight: 800; text-decoration: none; }
+    .hero { position: relative; padding: 92px 0 82px; }
+    .hero::before { position: absolute; top: -220px; left: 45%; width: 780px; height: 520px; border-radius: 50%; background: #285db52e; filter: blur(70px); content: ""; pointer-events: none; }
+    .hero-grid { position: relative; display: grid; grid-template-columns: .82fr 1.18fr; align-items: center; gap: 56px; }
+    .eyebrow { margin: 0 0 18px; color: var(--blue); font: 800 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { max-width: 620px; margin: 0; font-size: clamp(52px, 6.6vw, 86px); line-height: .93; letter-spacing: -.065em; }
+    .hero-copy { max-width: 540px; margin: 24px 0 30px; color: var(--muted); font-size: 18px; }
+    .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 11px; padding: 11px 18px; background: var(--panel); font-size: 14px; font-weight: 800; text-decoration: none; transition: transform .16s ease, border-color .16s ease; }
+    .button:hover { transform: translateY(-2px); border-color: #596170; }
+    .button.primary { border-color: var(--blue); background: var(--blue); color: #10213e; }
+    .availability { margin: 17px 0 0; color: var(--muted); font-size: 12px; }
+    .hero-visual { position: relative; }
+    .hero-visual::before, .hero-visual::after { position: absolute; width: 86px; height: 30px; border-radius: 8px 8px 3px 3px; content: ""; }
+    .hero-visual::before { top: -14px; left: 12%; background: var(--yellow); transform: rotate(-4deg); }
+    .hero-visual::after { right: 12%; bottom: -13px; background: var(--green); transform: rotate(4deg); }
+    .hero-visual img { position: relative; z-index: 1; display: block; width: 100%; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 34px 100px #0009; }
+    .proof { border-block: 1px solid var(--line); background: #14171c; }
+    .proof-inner { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .proof-item { padding: 23px 26px; }
+    .proof-item + .proof-item { border-left: 1px solid var(--line); }
+    .proof-item strong { display: block; font-size: 14px; }
+    .proof-item span { color: var(--muted); font-size: 12px; }
+    .story { padding: 112px 0; border-bottom: 1px solid var(--line); }
+    .story-grid { display: grid; grid-template-columns: .78fr 1.22fr; align-items: center; gap: 76px; }
+    .story:nth-of-type(even) .story-copy { order: 2; }
+    .story:nth-of-type(even) .story-visual { order: 1; }
+    .story-index { display: inline-flex; margin-bottom: 26px; align-items: center; gap: 10px; color: var(--muted); font: 700 11px ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .story-index::before { width: 42px; height: 4px; border-radius: 4px; background: var(--story-color); content: ""; }
+    h2 { max-width: 480px; margin: 0; font-size: clamp(36px, 4.8vw, 62px); line-height: 1; letter-spacing: -.05em; }
+    .story-copy > p { max-width: 470px; margin: 22px 0 0; color: var(--muted); }
+    .detail-list { display: grid; gap: 12px; margin: 28px 0 0; padding: 0; list-style: none; }
+    .detail-list li { position: relative; padding-left: 20px; font-size: 13px; }
+    .detail-list li::before { position: absolute; top: .55em; left: 0; width: 7px; height: 7px; border-radius: 2px; background: var(--story-color); content: ""; }
+    .story-visual img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 80px #0007; }
+    .privacy { position: relative; padding: 116px 0; overflow: hidden; }
+    .privacy::before { position: absolute; inset: 15% -10%; background: linear-gradient(90deg, #70a7ff17, #eb7ea711, #54c77b17); filter: blur(80px); content: ""; }
+    .privacy-inner { position: relative; display: grid; grid-template-columns: 1.25fr .75fr; gap: 80px; align-items: end; }
+    .privacy h2 { max-width: 700px; }
+    .privacy p { margin: 0; color: var(--muted); }
+    .privacy a { color: var(--text); text-underline-offset: 4px; }
+    .final { padding: 96px 0; border-top: 1px solid var(--line); text-align: center; }
+    .final h2 { max-width: 720px; margin-inline: auto; }
+    .final p { margin: 20px auto 30px; color: var(--muted); }
+    .final .actions { justify-content: center; }
+    footer { padding: 32px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; }
+    .footer-links { display: flex; gap: 20px; }
+    @media (max-width: 880px) {
+      .hero { padding-top: 68px; }
+      .hero-grid, .story-grid, .privacy-inner { grid-template-columns: 1fr; gap: 46px; }
+      .hero-copy { max-width: 680px; }
+      .story:nth-of-type(even) .story-copy, .story:nth-of-type(even) .story-visual { order: initial; }
+      .story { padding: 82px 0; }
+      .story-copy { max-width: 620px; }
+      .privacy { padding: 82px 0; }
+    }
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 28px, 1160px); }
+      .nav-links { display: none; }
+      .nav-cta { margin-left: auto; }
+      .hero { padding: 54px 0 60px; }
+      h1 { font-size: 50px; }
+      .hero-copy { font-size: 16px; }
+      .proof-inner { grid-template-columns: 1fr; }
+      .proof-item + .proof-item { border-top: 1px solid var(--line); border-left: 0; }
+      .story { padding: 68px 0; }
+      h2 { font-size: 40px; }
+      .footer-inner { flex-direction: column; }
+    }
+    @media (hover: hover) and (pointer: fine) { .nav-links a, .button { transition-duration: .16s; } }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .button { transition: none; } .button:hover { transform: none; } }
+  </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <img class="icon" src="icons/icon128.png" alt="Group Tabs icon" width="120" height="120">
-    <h1>Group Tabs</h1>
-    <p class="tagline">Tame your Chrome tabs.</p>
-    <p class="lede">A Chrome extension that auto-groups your tabs by domain, refines groups by topic with <b>on-device AI</b> — nothing leaves your machine — and snapshots your groups so a crash never loses them.</p>
-    <div class="cta">
-      <a class="btn btn-primary" href="https://github.com/krashnakant/group-tabs#load">Install (unpacked)</a>
-      <a class="btn btn-ghost" href="https://github.com/krashnakant/group-tabs">View on GitHub</a>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top"><img src="icons/icon48.png" alt="" />Group Tabs</a>
+      <div class="nav-links"><a href="#organize">Organize</a><a href="#ai">On-device AI</a><a href="#recover">Recover</a><a href="privacy.html">Privacy</a></div>
+      <a class="nav-cta" href="https://chromewebstore.google.com/detail/group-tabs/phgemhmkidohfhckegoemicfjeofnlbp">Add to Chrome</a>
     </div>
-    <div><span class="pill">⏳ Chrome Web Store — awaiting review</span></div>
-    <p class="meta">Chrome 138+ for the AI path · falls back to domain rules · MIT</p>
-  </div>
-</header>
+  </nav>
 
-<section>
-  <div class="wrap">
-    <h2>From tab soup to tidy groups</h2>
-    <p class="sub">One click groups every ungrouped tab by domain. A second click asks the on-device model to regroup them by topic.</p>
-    <img class="shot" src="store-assets/marquee-promo-ai.png" alt="Group Tabs — auto-group tabs by domain with on-device AI">
-    <div class="shot-grid">
-      <img class="shot" src="store-assets/screenshot-3-before.png" alt="Before: ungrouped tab soup">
-      <img class="shot" src="store-assets/screenshot-2.png" alt="After: tabs grouped by topic">
+  <main id="top">
+    <header class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">A control surface for tab-heavy work</p>
+          <h1>Tabs in. Working sets out.</h1>
+          <p class="hero-copy">Group matching sites in one click, sort them by topic with optional on-device AI, and keep useful windows as sessions.</p>
+          <div class="actions">
+            <a class="button primary" href="https://chromewebstore.google.com/detail/group-tabs/phgemhmkidohfhckegoemicfjeofnlbp">Add to Chrome</a>
+            <a class="button" href="https://github.com/krashnakant/group-tabs">View source</a>
+          </div>
+          <p class="availability">Site grouping works everywhere · Topic grouping needs Chrome's built-in Prompt API</p>
+        </div>
+        <div class="hero-visual"><img src="store-assets/marquee-promo-v3.png?v=1" alt="The current Group Tabs popup beside site-grouped browser tabs" /></div>
+      </div>
+    </header>
+
+    <div class="proof">
+      <div class="wrap proof-inner">
+        <div class="proof-item"><strong>No Group Tabs cloud</strong><span>Organization runs inside the browser</span></div>
+        <div class="proof-item"><strong>Manual groups stay yours</strong><span>Pinned tabs and existing groups are untouched</span></div>
+        <div class="proof-item"><strong>Observable automation</strong><span>See exactly what the last idle run changed</span></div>
+      </div>
     </div>
-  </div>
-</section>
 
-<section>
-  <div class="wrap">
-    <h2>What it does</h2>
-    <div class="grid">
-      <div class="card"><span class="ic">🗂️</span><h3>Group by domain</h3><p>Instant. Groups ungrouped, unpinned http(s) tabs in the current window by domain. Manual groups and pinned tabs are never touched.</p></div>
-      <div class="card"><span class="ic">🧠</span><h3>Refine with AI</h3><p>Classifies tabs by topic using Chrome's built-in Prompt API (Gemini Nano). Fully on-device — your tab titles and URLs never leave your machine.</p></div>
-      <div class="card"><span class="ic">💾</span><h3>Save &amp; restore</h3><p>Snapshot all tab groups in a window — titles, colors, URLs — under a name. Reopen the whole set later, regrouped exactly as saved.</p></div>
-      <div class="card"><span class="ic">🛟</span><h3>Crash recovery</h3><p>Every group change triggers a debounced auto-save. If Chrome crashes and drops your group assignments, restore from the auto-saved snapshot.</p></div>
-      <div class="card"><span class="ic">🔒</span><h3>Private by design</h3><p>No servers, no analytics, no accounts. Snapshots live in <code>chrome.storage.local</code>. See the <a href="privacy.html">privacy policy</a>.</p></div>
-      <div class="card"><span class="ic">⚡</span><h3>Graceful fallback</h3><p>The AI path needs Chrome 138+ with the on-device model available; otherwise domain grouping covers it — no cloud fallback, by choice.</p></div>
-    </div>
-  </div>
-</section>
+    <section class="story" id="organize" style="--story-color:var(--blue)">
+      <div class="wrap story-grid">
+        <div class="story-copy">
+          <span class="story-index">01 · Organize</span>
+          <h2>Bring order without rearranging your work.</h2>
+          <p>Group loose, unpinned tabs by matching site. Existing groups stay intact, and single-site tabs remain loose instead of creating one-tab clutter.</p>
+          <ul class="detail-list"><li>One click or <strong>Ctrl+Shift+G</strong></li><li>Optional grouping for newly opened tabs</li><li>Idle sweeps report grouped and skipped tabs</li></ul>
+        </div>
+        <div class="story-visual"><img src="store-assets/demo-1-grouping-v2.png?v=1" alt="The current Group Tabs popup reporting a completed site-grouping run" loading="lazy" /></div>
+      </div>
+    </section>
 
-<section>
-  <div class="wrap">
-    <h2>Install in a minute</h2>
-    <p class="sub">Awaiting Chrome Web Store review — until then, load it unpacked. It's three clicks.</p>
-    <ol class="steps">
-      <li><b>Get the code:</b> <code>git clone https://github.com/krashnakant/group-tabs.git</code> (or download the ZIP from GitHub).</li>
-      <li><b>Open</b> <code>chrome://extensions</code>, enable <b>Developer mode</b> (top right).</li>
-      <li><b>Load unpacked</b> → select the <code>group-tabs</code> folder. Pin the icon, click it, hit <b>Group by domain</b>.</li>
-    </ol>
-    <p class="note">The Web Store listing is under review — this page will link straight to it once approved.</p>
-  </div>
-</section>
+    <section class="story" id="ai" style="--story-color:var(--yellow)">
+      <div class="wrap story-grid">
+        <div class="story-copy">
+          <span class="story-index">02 · Refine</span>
+          <h2>Turn site names into useful topics.</h2>
+          <p>When Chrome's built-in Prompt API is available, Group Tabs can classify eligible tabs into categories such as Work, Development, or Research. Processing stays on-device; there is no cloud fallback.</p>
+          <ul class="detail-list"><li>Topic names are customizable</li><li>Manual groups and pinned tabs stay untouched</li><li>Site grouping remains available without AI</li></ul>
+        </div>
+        <div class="story-visual"><img src="store-assets/demo-2-ai-v2.png?v=1" alt="The current Group Tabs popup after organizing twelve tabs into four topics" loading="lazy" /></div>
+      </div>
+    </section>
 
-<footer>
-  <div class="wrap">
-    <div class="links">
-      <a href="https://github.com/krashnakant/group-tabs">GitHub</a>
-      <a href="privacy.html">Privacy policy</a>
-      <a href="https://krashna.in">krashna.in</a>
-    </div>
-    <p>MIT licensed · On-device AI via Chrome's built-in Gemini Nano · Not affiliated with Google.</p>
-  </div>
-</footer>
+    <section class="story" id="recover" style="--story-color:var(--green)">
+      <div class="wrap story-grid">
+        <div class="story-copy">
+          <span class="story-index">03 · Recover</span>
+          <h2>Reopen the missing parts of a session.</h2>
+          <p>Save a grouped window under a name. Restore later into a new window; URLs already open elsewhere are skipped and the result reports exactly what came back.</p>
+          <ul class="detail-list"><li>Small manual sessions may use Chrome Sync</li><li>Large sessions stay on this device</li><li>Automatic recovery keeps three local snapshots</li></ul>
+        </div>
+        <div class="story-visual"><img src="store-assets/demo-3-snapshots-v2.png?v=1" alt="The current Group Tabs popup showing local recovery and a saved session" loading="lazy" /></div>
+      </div>
+    </section>
+
+    <section class="privacy">
+      <div class="wrap privacy-inner">
+        <div><p class="eyebrow">Private by architecture</p><h2>No analytics. No account. No developer-operated backend.</h2></div>
+        <p>Group Tabs makes no remote API calls. Chrome Sync may carry small manual sessions through your browser account; automatic recovery stays local. <a href="privacy.html">Read the full storage contract.</a></p>
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="wrap">
+        <h2>Give every open tab a place—or leave it alone.</h2>
+        <p>Install from the Chrome Web Store, or inspect every line on GitHub.</p>
+        <div class="actions"><a class="button primary" href="https://chromewebstore.google.com/detail/group-tabs/phgemhmkidohfhckegoemicfjeofnlbp">Add to Chrome</a><a class="button" href="https://github.com/krashnakant/group-tabs">View source</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap footer-inner"><span>Group Tabs · MIT licensed · Not affiliated with Google</span><div class="footer-links"><a href="https://github.com/krashnakant/group-tabs">GitHub</a><a href="privacy.html">Privacy</a><a href="https://krashna.in">krashna.in</a></div></div></footer>
 </body>
 </html>

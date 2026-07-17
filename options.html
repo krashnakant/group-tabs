@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Group Tabs settings</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --accent: #1769e0;
+        --bg: #f4f6fa;
+        --panel: #fff;
+        --text: #171a20;
+        --muted: #646b77;
+        --line: #dfe3ea;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, sans-serif; }
+      header { border-bottom: 1px solid var(--line); background: var(--panel); }
+      .header-inner, main { width: min(720px, calc(100% - 32px)); margin: 0 auto; }
+      .header-inner { display: flex; align-items: center; gap: 12px; padding: 22px 0; }
+      .mark { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; background: var(--accent); color: #fff; font-weight: 800; }
+      h1 { margin: 0; font-size: 22px; letter-spacing: -0.02em; }
+      .subtitle { margin: 1px 0 0; color: var(--muted); font-size: 13px; }
+      main { padding: 32px 0 48px; }
+      h2 { margin: 30px 0 10px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+      h2:first-child { margin-top: 0; }
+      .card { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+      .setting { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 22px; min-height: 74px; padding: 14px 16px; }
+      .setting + .setting { border-top: 1px solid var(--line); }
+      .setting strong { display: block; font-size: 14px; }
+      .setting p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+      select, input, button { min-height: 40px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); color: var(--text); font: inherit; }
+      select { min-width: 145px; padding: 7px 34px 7px 11px; }
+      input[type="text"] { width: 100%; margin-top: 10px; padding: 8px 11px; }
+      input[type="checkbox"] { width: 20px; height: 20px; min-height: 20px; accent-color: var(--accent); }
+      button { cursor: pointer; padding: 7px 13px; color: var(--accent); font-weight: 700; }
+      button:hover:not(:disabled) { border-color: #afb6c2; background: #f0f2f6; }
+      button:disabled { cursor: default; opacity: 0.5; }
+      :focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 28%, transparent); outline-offset: 2px; }
+      .wide { grid-template-columns: 1fr; align-items: start; }
+      .automation { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 14px 16px; border-top: 1px solid var(--line); background: color-mix(in srgb, var(--accent) 4%, var(--panel)); }
+      #idleLastRun { color: var(--muted); font-size: 12px; }
+      .privacy { margin: 24px 0 0; color: var(--muted); font-size: 12px; }
+      a { color: var(--accent); }
+      @media (max-width: 560px) {
+        .setting, .automation { grid-template-columns: 1fr; gap: 10px; }
+        select, .automation button { width: 100%; }
+      }
+      @media (prefers-color-scheme: dark) {
+        :root { --accent: #8ab4f8; --bg: #14161b; --panel: #1d2026; --text: #edf0f6; --muted: #aab0bc; --line: #353944; }
+        button:hover:not(:disabled) { background: #292d35; border-color: #555b67; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="mark" aria-hidden="true">GT</div>
+        <div><h1>Group Tabs settings</h1><p class="subtitle">Automation, recovery, and on-device AI</p></div>
+      </div>
+    </header>
+    <main>
+      <h2>Recovery</h2>
+      <div class="card">
+        <label class="setting">
+          <span><strong>Auto-save groups</strong><p>Keeps the latest three recovery snapshots on this device.</p></span>
+          <select id="autoSave">
+            <option value="0">Off</option><option value="0.5">Every 30 seconds</option><option value="1">Every minute</option><option value="5">Every 5 minutes</option><option value="15">Every 15 minutes</option>
+          </select>
+        </label>
+      </div>
+
+      <h2>Automation</h2>
+      <div class="card">
+        <label class="setting">
+          <span><strong>Auto-group new tabs</strong><p>New tabs join their site's group as they finish loading.</p></span>
+          <input type="checkbox" id="autoGroup" />
+        </label>
+        <label class="setting">
+          <span><strong>Organize while away</strong><p>After 30 minutes without input, organize loose tabs in the last focused window.</p></span>
+          <select id="idleMode">
+            <option value="off">Off</option><option value="domain">By site</option><option value="ai">By topic with AI</option>
+          </select>
+        </label>
+        <div class="automation">
+          <output id="idleLastRun">Not run yet.</output>
+          <button id="runIdle">Run now</button>
+        </div>
+      </div>
+
+      <h2 id="aiHeading">On-device AI</h2>
+      <div class="card" id="aiCard">
+        <label class="setting wide">
+          <span><strong>Topic names</strong><p>Comma-separated categories the built-in model should prefer.</p></span>
+          <input type="text" id="categories" placeholder="Work, Development, Social" />
+        </label>
+      </div>
+      <p id="aiUnavailable" class="privacy" hidden>Topic grouping is unavailable because this browser does not expose the built-in Prompt API. Site grouping still works.</p>
+
+      <p class="privacy">No Group Tabs server or analytics. Manual sessions may use Chrome Sync when small enough; recovery snapshots stay on this device. <a href="privacy.html">Read the privacy policy</a>.</p>
+    </main>
+    <script src="options.js" type="module"></script>
+  </body>
+</html>
